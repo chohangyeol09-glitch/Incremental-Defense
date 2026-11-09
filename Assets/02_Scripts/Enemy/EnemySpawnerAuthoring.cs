@@ -29,9 +29,12 @@ namespace _02_Scripts.Enemy
                     MaxY = laneData.MaxY
                 });
                 
-                AddComponent(entity new EnemySpawnConfig
+                AddComponent(entity, new EnemySpawnConfig
                 {
-                    SpawnPerSecond = 
+                    SpawnPerSecond = spawnData.SpawnPerSecond,
+                    MaxCount =  spawnData.MaxCount,
+                    MinSpeed = spawnData.MinSpeed,
+                    MaxSpeed = spawnData.MaxSpeed,
                 });
             }
         }
