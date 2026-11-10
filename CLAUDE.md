@@ -28,9 +28,9 @@
 | --- | --- |
 | `Assets/01_Scenes` | 씬 |
 | `Assets/02_Scripts` | C# 스크립트 |
-| `Assets/03.Datas` | ScriptableObject 데이터, Input 에셋, Animator Controller |
-| `Assets/04.Prefabs` | 프리팹 |
-| `Assets/05.Graphic` | 스프라이트, 애니메이션, 에셋 팩, 머티리얼, 셰이더 |
+| `Assets/03_Data` | ScriptableObject 데이터, Input 에셋, Animator Controller |
+| `Assets/04_Prefabs` | 프리팹 (아직 없음, 필요할 때 생성) |
+| `Assets/05_Graphic` | 스프라이트, 애니메이션, 에셋 팩, 머티리얼, 셰이더 |
 
 ## 코딩 규칙
 

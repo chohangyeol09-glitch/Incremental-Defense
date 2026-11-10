@@ -7,6 +7,9 @@
         _Rows ("Rows", Float) = 1
         _QuadSize ("Quad Size", Float) = 1
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
+        _FrameCount ("Frame Count", Float) = 4          
+        _FramesPerSecond ("Frames Per Second", Float) = 8 
+        _DepthPerY ("Depth Per Y", Float) = 0.1         
     }
 
     SubShader
@@ -31,6 +34,7 @@
             SAMPLER(sampler_MainTex);
 
             StructuredBuffer<float2> _Positions;
+            StructuredBuffer<float> _AnimationOffsets;
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
@@ -38,6 +42,9 @@
                 float _Rows;
                 float _QuadSize;
                 float _Cutoff;
+                float _FrameCount;     
+                float _FramesPerSecond;
+                float _DepthPerY; 
             CBUFFER_END
 
             struct Attributes
@@ -57,11 +64,17 @@
                 Varyings output;
 
                 float2 instancePosition = _Positions[instanceID];
-                float3 positionWS = float3(instancePosition + input.positionOS.xy * _QuadSize, 0.0);
+                float depth = instancePosition.y * _DepthPerY; 
+                float3 positionWS = float3(instancePosition + input.positionOS.xy * _QuadSize, depth); 
                 output.positionCS = TransformWorldToHClip(positionWS);
 
+                float cycle = frac(_Time.y * _FramesPerSecond / _FrameCount + _AnimationOffsets[instanceID]); 
+                float frame = floor(cycle * _FrameCount); 
+                float column = fmod(frame, _Columns);     
+                float row = floor(frame / _Columns);      
+
                 float2 cellSize = 1.0 / float2(_Columns, _Rows);
-                output.uv = (input.uv + float2(0.0, _Rows - 1.0)) * cellSize;
+                output.uv = (input.uv + float2(column, _Rows - 1.0 - row)) * cellSize; 
 
                 return output;
             }

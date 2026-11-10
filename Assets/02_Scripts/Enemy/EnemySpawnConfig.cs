@@ -8,5 +8,6 @@ namespace _02_Scripts.Enemy
         public int MaxCount;
         public float MinSpeed;
         public float MaxSpeed;
+        public float MaxHealth;
     }
 }

@@ -9,5 +9,6 @@ namespace _02_Scripts.Enemy
         [field: SerializeField] public int MaxCount { get; private set; } = 50000;
         [field: SerializeField] public float MinSpeed { get; private set; } = 2f;
         [field: SerializeField] public float MaxSpeed { get; private set; } = 3f; 
+        [field: SerializeField] public float MaxHealth { get; private set; } = 10f;
     }
 }

@@ -13,20 +13,23 @@ namespace _02_Scripts.Rendering
     {
         private const int PositionStride = sizeof(float) * 2;
         private const int MinBufferCapacity = 1024;
+        private const int AnimationOffsetStride = sizeof(float);
 
         private static readonly int PositionsId = Shader.PropertyToID("_Positions");
         private static readonly Bounds RenderBounds = new Bounds(Vector3.zero, Vector3.one * 10000f);
+        private static readonly int AnimationOffsetsId = Shader.PropertyToID("_AnimationOffsets");
 
         private EntityQuery _spriteQuery;
         private Mesh _quadMesh;
         private GraphicsBuffer _positionBuffer;
         private MaterialPropertyBlock _propertyBlock;
+        private GraphicsBuffer _animationOffsetBuffer;
 
         protected override void OnCreate()
         {
             RequireForUpdate<SpriteRenderConfig>();
 
-            _spriteQuery = SystemAPI.QueryBuilder().WithAll<Position2D, EnemyTag>().Build();
+            _spriteQuery = SystemAPI.QueryBuilder().WithAll<Position2D, SpriteAnimationOffset, EnemyTag>().Build();
             _quadMesh = CreateQuadMesh();
             _propertyBlock = new MaterialPropertyBlock();
         }
@@ -34,6 +37,7 @@ namespace _02_Scripts.Rendering
         protected override void OnDestroy()
         {
             _positionBuffer?.Release();
+            _animationOffsetBuffer?.Release();
             CoreUtils.Destroy(_quadMesh);
         }
 
@@ -51,9 +55,13 @@ namespace _02_Scripts.Rendering
             var positions = _spriteQuery.ToComponentDataArray<Position2D>(Allocator.TempJob);
             _positionBuffer.SetData(positions);
             positions.Dispose();
+            var animationOffsets = _spriteQuery.ToComponentDataArray<SpriteAnimationOffset>(Allocator.TempJob); 
+            _animationOffsetBuffer.SetData(animationOffsets); 
+            animationOffsets.Dispose(); 
 
             _propertyBlock.SetBuffer(PositionsId, _positionBuffer);
-
+            _propertyBlock.SetBuffer(AnimationOffsetsId, _animationOffsetBuffer); 
+            
             var renderParams = new RenderParams(material)
             {
                 worldBounds = RenderBounds,
@@ -69,9 +77,11 @@ namespace _02_Scripts.Rendering
                 return;
 
             _positionBuffer?.Release();
+            _animationOffsetBuffer?.Release();
 
             int capacity = math.max(MinBufferCapacity, math.ceilpow2(requiredCount));
             _positionBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, capacity, PositionStride);
+            _animationOffsetBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, capacity, AnimationOffsetStride);
         }
 
         private static Mesh CreateQuadMesh()

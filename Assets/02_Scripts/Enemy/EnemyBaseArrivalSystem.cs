@@ -6,7 +6,7 @@ using Unity.Mathematics;
 namespace _02_Scripts.Enemy
 {
     [BurstCompile]
-    [UpdateAfter(typeof(MoveSystem))]
+    [UpdateAfter(typeof(EnemyDeathSystem))]
     public partial struct EnemyBaseArrivalSystem : ISystem
     {
         [BurstCompile]

@@ -35,6 +35,7 @@ namespace _02_Scripts.Enemy
                     MaxCount =  spawnData.MaxCount,
                     MinSpeed = spawnData.MinSpeed,
                     MaxSpeed = spawnData.MaxSpeed,
+                    MaxHealth = spawnData.MaxHealth,
                 });
             }
         }

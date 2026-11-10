@@ -1,8 +1,12 @@
-﻿using _02_Scripts.Movement;
+﻿using _02_Scripts.Combat;
+using _02_Scripts.Movement;
+using _02_Scripts.Rendering;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace _02_Scripts.Enemy
 {
@@ -20,13 +24,13 @@ namespace _02_Scripts.Enemy
         {
             state.RequireForUpdate<LaneConfig>();
             state.RequireForUpdate<EnemySpawnConfig>();
-            
-            var componentTypes = new NativeArray<ComponentType>(3, Allocator.Temp);
+
+            var componentTypes = new NativeArray<ComponentType>(5, Allocator.Temp);
             componentTypes[0] = ComponentType.ReadWrite<Position2D>();
             componentTypes[1] = ComponentType.ReadWrite<Velocity2D>();
             componentTypes[2] = ComponentType.ReadWrite<EnemyTag>();
-            _enemyArchetype = state.EntityManager.CreateArchetype(componentTypes);
-            
+            componentTypes[3] = ComponentType.ReadWrite<SpriteAnimationOffset>(); 
+            componentTypes[4] = ComponentType.ReadWrite<Health>();
             _enemyArchetype = state.EntityManager.CreateArchetype(componentTypes);
 
             _enemyQuery = SystemAPI.QueryBuilder().WithAll<EnemyTag>().Build();
@@ -64,6 +68,16 @@ namespace _02_Scripts.Enemy
                 state.EntityManager.SetComponentData(entities[i], new Velocity2D
                 {
                     Value = new float2(direction * speed, 0f)
+                });
+                
+                state.EntityManager.SetComponentData(entities[i], new SpriteAnimationOffset 
+                {                                                                          
+                    Value = _random.NextFloat()                                            
+                });                                                                        
+                
+                state.EntityManager.SetComponentData(entities[i], new Health
+                {
+                    Value = spawn.MaxHealth
                 });
             }
         }
