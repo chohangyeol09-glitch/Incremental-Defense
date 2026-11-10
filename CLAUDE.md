@@ -45,8 +45,8 @@
 
 ### 네임스페이스
 
-- `IncrementalDefense.<폴더 경로>` 형식으로, `02_Scripts` 아래 폴더 구조와 일치시킨다.
-  - 예: `Assets/02_Scripts/Player/Combat/` → `IncrementalDefense.Player.Combat`
+- `_02_Scripts.<폴더 경로>` 형식으로, `02_Scripts` 아래 폴더 구조와 일치시킨다. (IDE가 폴더 이름으로 자동 생성하는 형식 그대로 쓴다.)
+  - 예: `Assets/02_Scripts/Player/Combat/` → `_02_Scripts.Player.Combat`
 
 ### 필드 / 프로퍼티
 

@@ -1,4 +1,5 @@
-﻿using Unity.Burst;
+﻿using _02_Scripts.Movement;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -6,6 +7,7 @@ using Unity.Mathematics;
 namespace _02_Scripts.Enemy
 {
     [BurstCompile]
+    [UpdateBefore(typeof(MoveSystem))]
     public partial struct EnemySpawnSystem : ISystem
     {
         private EntityArchetype _enemyArchetype;
@@ -19,15 +21,16 @@ namespace _02_Scripts.Enemy
             state.RequireForUpdate<LaneConfig>();
             state.RequireForUpdate<EnemySpawnConfig>();
             
-            NativeArray<ComponentType> componentTypes = new NativeArray<ComponentType>(2, Allocator.Temp);
-            componentTypes[0] = ComponentType.ReadWrite<EnemyPosition>();
-            componentTypes[1] = ComponentType.ReadWrite<EnemySpeed>();
+            var componentTypes = new NativeArray<ComponentType>(3, Allocator.Temp);
+            componentTypes[0] = ComponentType.ReadWrite<Position2D>();
+            componentTypes[1] = ComponentType.ReadWrite<Velocity2D>();
+            componentTypes[2] = ComponentType.ReadWrite<EnemyTag>();
             _enemyArchetype = state.EntityManager.CreateArchetype(componentTypes);
             
             _enemyArchetype = state.EntityManager.CreateArchetype(componentTypes);
 
-            _enemyQuery = SystemAPI.QueryBuilder().WithAll<EnemyPosition>().Build();
-            _random = new Random(0x6E624EB7u);
+            _enemyQuery = SystemAPI.QueryBuilder().WithAll<EnemyTag>().Build();
+            _random = Random.CreateFromIndex(0);
         }
 
         [BurstCompile]
@@ -45,19 +48,22 @@ namespace _02_Scripts.Enemy
             if (spawnCount <= 0)
                 return;
 
+            float direction = math.sign(lane.BaseX - lane.SpawnX);
+            
             var entities = new NativeArray<Entity>(spawnCount, Allocator.Temp);
             state.EntityManager.CreateEntity(_enemyArchetype, entities);
 
             for (int i = 0; i < entities.Length; i++)
             {
-                state.EntityManager.SetComponentData(entities[i], new EnemyPosition
+                state.EntityManager.SetComponentData(entities[i], new Position2D
                 {
                     Value = new float2(lane.SpawnX, _random.NextFloat(lane.MinY, lane.MaxY))
                 });
 
-                state.EntityManager.SetComponentData(entities[i], new EnemySpeed
+                float speed = _random.NextFloat(spawn.MinSpeed, spawn.MaxSpeed);
+                state.EntityManager.SetComponentData(entities[i], new Velocity2D
                 {
-                    Value = _random.NextFloat(spawn.MinSpeed, spawn.MaxSpeed)
+                    Value = new float2(direction * speed, 0f)
                 });
             }
         }
